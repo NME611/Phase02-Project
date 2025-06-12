@@ -12,26 +12,30 @@ export function App(params) {
   useEffect(() => { getCustomers() }, []);
 
   const getCustomers =  function(){
-  let mode = (formObject.id >= 0) ? 'Update' : 'Add';
-  log("in getCustomers()");
-  setCustomers(getAll());
-
+    let mode = (formObject.id >= 0) ? 'Update' : 'Add';
+    log("in getCustomers()");
+    setCustomers(getAll());
   }
 
   const handleListClick = function(item){
-  log("in handleListClick()"); 
-  if (item.id === formObject.id) {
-    // Deselect and clear form
-    setFormObject(blankCustomer);
-  } else {
-    // Select new customer
-    setFormObject(item);
+    log("in handleListClick()"); 
+    if (item.id === formObject.id) {
+      // Deselect and clear form
+      setFormObject(blankCustomer);
+    } else {
+      // Select new customer
+      setFormObject(item);
+    }
   }
-}
 
   const handleInputChange = function (event) {
     log("in handleInputChange()");
-  }
+    const name = event.target.name;
+    const value = event.target.value;
+    let newFormObject = {...formObject}
+    newFormObject[name] = value;
+    setFormObject(newFormObject);
+}
 
   let onCancelClick = function () {
     log("in onCancelClick()");
@@ -39,12 +43,21 @@ export function App(params) {
   }
 
   let onDeleteClick = function () {
-    log("in onDeleteClick()");
+    if(formObject.id >= 0){
+      deleteById(formObject.id);
+    }
+    setFormObject(blankCustomer);
   }
 
   let onSaveClick = function () {
-    log("in onSaveClick()");
-  }
+    if (mode === 'Add') {
+post(formObject);
+}
+    if (mode === 'Update') {
+      put(formObject.id, formObject);
+}
+setFormObject(blankCustomer);
+}
 
   return (
     <div>
@@ -62,8 +75,8 @@ export function App(params) {
             {customers.map(
               (item, index) => {
                 return (<tr key={item.id} 
-                className={ (item.id === formObject.id )?'selected': ''}
-                onClick={()=>handleListClick(item)} 
+                  className={ (item.id === formObject.id )?'selected': ''}
+                  onClick={()=>handleListClick(item)} 
                 >
                   <td>{item.name}</td>
                   <td>{item.email}</td>
@@ -73,50 +86,62 @@ export function App(params) {
             )}
           </tbody>
         </table>
-    </div>
-    <div className="boxed">
-      <div>
-        <h4>{mode}</h4>
       </div>
-      <form >
-        <table id="customer-add-update" >
-          <tbody>
-            <tr>
-              <td className={'label'} >Name:</td>
-              <td><input
-                type="text"
-                name="name"
-                value={formObject.name}
-                placeholder="Customer Name"
-                required /></td>
-            </tr>
-            <tr>
-              <td className={'label'} >Email:</td>
-              <td><input
-                type="email"
-                name="email"
-                value={formObject.email}
-                placeholder="name@company.com" /></td>
-            </tr>
-            <tr>
-              <td className={'label'} >Pass:</td>
-              <td><input
-                type="text"
-                name="password"
-                value={formObject.password}
-                placeholder="password" /></td>
-            </tr>
-            <tr className="button-bar">
-              <td colSpan="2">
-                <input type="button" value="Delete" onClick={onDeleteClick} />
-                <input type="button" value="Save" onClick={onSaveClick} />
-                <input type="button" value="Cancel" onClick={onCancelClick} />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
-    </div>
+      <div className="boxed">
+        <div>
+          <h4>{mode}</h4>
+        </div>
+        <form >
+          <table id="customer-add-update" >
+            <tbody>
+              <tr>
+                <td className={'label'} >Name:</td>
+                <td>
+                  <input
+                    type="text"
+                    name="name"
+                    onChange={handleInputChange}
+                    value={formObject.name}
+                    placeholder="Customer Name"
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className={'label'} >Email:</td>
+                <td>
+                  <input
+                    type="email"
+                    name="email"
+                    onChange={handleInputChange}
+                    value={formObject.email}
+                    placeholder="name@company.com"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className={'label'} >Pass:</td>
+                <td>
+                  <input
+                    type="password"
+                    name="password"
+                    onChange={handleInputChange}
+                    value={formObject.password}
+                    placeholder="password"
+                  />
+                </td>
+              </tr>
+              <tr className="button-bar">
+                <td colSpan="2">
+                  <input type="button" value="Delete" onClick={onDeleteClick} />
+                  <input type="button" value="Save" onClick={onSaveClick} />
+                  <input type="button" value="Cancel" onClick={onCancelClick} />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
     </div>
   );
 }
