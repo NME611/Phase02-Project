@@ -19,7 +19,7 @@ export function App(params) {
   }
 
   const handleListClick = function(item){
-  log("in handleListClick()");
+  log("in handleListClick()"); 
   if (item.id === formObject.id) {
     // Deselect and clear form
     setFormObject(blankCustomer);
